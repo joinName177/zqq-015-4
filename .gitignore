@@ -11,3 +11,6 @@ node_modules/
 .env.*
 !.env.example
 !.env.sample
+
+# 测试构建产物
+dist-test

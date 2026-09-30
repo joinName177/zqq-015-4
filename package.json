@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "pretest": "tsc -p tsconfig.test.json && node -e \"require('fs').writeFileSync('dist-test/package.json','{\\\"type\\\":\\\"commonjs\\\"}')\"",
+    "test": "node --test test/"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

@@ -1,16 +1,20 @@
 import { IdiomProfile, KinshipResult } from '../core/models';
 
+export type AppMode = 'single' | 'compare' | 'study';
+
 export interface IdiomUIHandlers {
   onSearch: (idiomText: string) => void;
   onCompare: (idiomA: string, idiomB: string) => void;
-  onSwitchMode: (mode: 'single' | 'compare') => void;
+  onSwitchMode: (mode: AppMode) => void;
+  onToggleFavorite?: (idiomText: string) => void;
+  isFavorited?: (idiomText: string) => boolean;
 }
 
 export function renderIdiomApp(
   container: HTMLElement,
   currentProfile: IdiomProfile,
   presets: string[],
-  mode: 'single' | 'compare',
+  mode: AppMode,
   kinshipResult: KinshipResult | null,
   compareA: string,
   compareB: string,
@@ -65,6 +69,7 @@ export function renderIdiomApp(
         <div class="mode-toggle">
           <button class="mode-btn ${mode === 'single' ? 'active' : ''}" id="btnModeSingle">单词溯源剖析</button>
           <button class="mode-btn ${mode === 'compare' ? 'active' : ''}" id="btnModeCompare">双词亲缘对比</button>
+          <button class="mode-btn ${mode === 'study' ? 'active' : ''}" id="btnModeStudy">📅 学习计划</button>
         </div>
       </header>
 
@@ -86,7 +91,15 @@ export function renderIdiomApp(
         <!-- Idiom Hero Banner -->
         <section class="idiom-hero">
           <div class="hero-main">
-            <h2>${esc(currentProfile.idiom)}</h2>
+            <h2>
+              ${esc(currentProfile.idiom)}
+              ${
+                handlers.onToggleFavorite
+                  ? `<button class="fav-btn hero-fav ${handlers.isFavorited?.(currentProfile.idiom) ? 'on' : ''}" id="btnHeroFav"
+                      title="${handlers.isFavorited?.(currentProfile.idiom) ? '取消收藏' : '加入收藏，进入学习计划'}">★</button>`
+                  : ''
+              }
+            </h2>
             <div class="hero-pinyin">${esc(currentProfile.pinyin)} · ${esc(currentProfile.syntacticRole)}</div>
             <div class="hero-desc">${esc(currentProfile.modernDefinition)}</div>
           </div>
@@ -270,6 +283,8 @@ export function renderIdiomApp(
   // Attach event listeners
   container.querySelector('#btnModeSingle')?.addEventListener('click', () => handlers.onSwitchMode('single'));
   container.querySelector('#btnModeCompare')?.addEventListener('click', () => handlers.onSwitchMode('compare'));
+  container.querySelector('#btnModeStudy')?.addEventListener('click', () => handlers.onSwitchMode('study'));
+  container.querySelector('#btnHeroFav')?.addEventListener('click', () => handlers.onToggleFavorite?.(currentProfile.idiom));
 
   if (mode === 'single') {
     const singleInput = container.querySelector('#singleInput') as HTMLInputElement;
